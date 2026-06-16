@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>香港保險試題庫</title>
+    <link rel="stylesheet" href="styles.css?v=20260616-8" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">香港保險試題庫</p>
+          <h1>科目一、科目三隨機練習</h1>
+        </div>
+        <div class="stats" aria-label="練習統計">
+          <div>
+            <span id="answeredCount">0</span>
+            <small>已答</small>
+          </div>
+          <div>
+            <span id="accuracyRate">0%</span>
+            <small>正確率</small>
+          </div>
+          <button id="resetStats" type="button" class="icon-button" title="重置統計" aria-label="重置統計">
+            ↺
+          </button>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="篩選題目">
+        <label>
+          科目
+          <select id="paperFilter"></select>
+        </label>
+        <label>
+          題庫
+          <select id="sourceFilter"></select>
+        </label>
+        <label>
+          章節
+          <select id="chapterFilter"></select>
+        </label>
+        <button id="nextQuestion" type="button">隨機下一題</button>
+      </section>
+
+      <section class="question-panel">
+        <div class="swipe-hint" aria-hidden="true">左滑下一題，右滑上一題</div>
+        <div class="swipe-zone" aria-hidden="true"></div>
+        <div class="question-meta">
+          <span id="questionSubject">載入中</span>
+          <span id="questionSource"></span>
+          <span id="questionChapter"></span>
+        </div>
+
+        <h2 id="questionText">正在準備題目...</h2>
+
+        <div id="options" class="options" aria-label="答案選項"></div>
+
+        <div id="result" class="result" hidden></div>
+
+        <div class="actions">
+          <button id="showAnswer" type="button" class="secondary">顯示答案</button>
+          <button id="retryWrong" type="button" class="secondary">只練錯題</button>
+          <button id="nextQuestionBottom" type="button">隨機下一題</button>
+        </div>
+      </section>
+
+      <section class="review-panel">
+        <div>
+          <strong id="availableCount">0</strong>
+          <span>道可練題目</span>
+        </div>
+        <div>
+          <strong id="wrongCount">0</strong>
+          <span>道錯題</span>
+        </div>
+        <div>
+          <strong id="totalCount">0</strong>
+          <span>道已收錄</span>
+        </div>
+      </section>
+    </main>
+
+    <script src="data/questions.js?v=20260616-8"></script>
+    <script src="app.js?v=20260616-8"></script>
+  </body>
+</html>

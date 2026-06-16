@@ -1,0 +1,5 @@
+source-pdfs/
+tools/
+data/questions.json
+__pycache__/
+*.pyc
