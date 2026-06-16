@@ -1,5 +1,6 @@
 source-pdfs/
 tools/
 data/questions.json
+hk-insurance-question-bank-pages.zip
 __pycache__/
 *.pyc
