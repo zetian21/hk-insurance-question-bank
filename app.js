@@ -31,6 +31,7 @@ const state = {
   wrongOnly: false,
   previousStack: [],
   nextStack: [],
+  seenIds: new Set(),
   animating: false,
   touch: {
     startX: 0,
@@ -99,6 +100,7 @@ function resetQuestionFlow() {
   state.current = null;
   state.previousStack = [];
   state.nextStack = [];
+  state.seenIds = new Set();
 
   const questions = filteredQuestions();
   els.availableCount.textContent = questions.length;
@@ -108,6 +110,10 @@ function resetQuestionFlow() {
   }
 
   const first = pickRandomQuestion(questions);
+  if (!first) {
+    showEmptyState();
+    return;
+  }
   state.current = first;
   fillNextBuffer();
   renderQuestion(first, "none");
@@ -116,20 +122,22 @@ function resetQuestionFlow() {
 function fillNextBuffer() {
   const questions = filteredQuestions();
   while (state.nextStack.length < NEXT_BUFFER_SIZE && questions.length) {
-    state.nextStack.push(pickRandomQuestion(questions));
+    const next = pickRandomQuestion(questions);
+    if (!next) break;
+    state.nextStack.push(next);
   }
 }
 
 function pickRandomQuestion(questions) {
   const blockedIds = new Set([
     state.current?.id,
-    ...state.previousStack.slice(-4).map((q) => q.id),
+    ...state.seenIds,
     ...state.nextStack.map((q) => q.id),
   ].filter(Boolean));
 
   const candidates = questions.filter((question) => !blockedIds.has(question.id));
-  const pool = candidates.length ? candidates : questions;
-  return pool[Math.floor(Math.random() * pool.length)];
+  if (!candidates.length) return null;
+  return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
 function goNext({ animate = true } = {}) {
@@ -143,19 +151,24 @@ function goNext({ animate = true } = {}) {
 
   fillNextBuffer();
   const next = state.nextStack.shift() || pickRandomQuestion(questions);
+  if (!next) {
+    showNotice("已經是最後一題");
+    return;
+  }
   if (state.current) {
     state.previousStack.push(state.current);
   }
+  state.seenIds.add(next.id);
   fillNextBuffer();
   renderQuestion(next, animate ? "next" : "none");
 }
 
 function goPrevious() {
-  if (!state.previousStack.length) return;
-  const previous = state.previousStack.pop();
-  if (state.current) {
-    state.nextStack.unshift(state.current);
+  if (!state.previousStack.length) {
+    showNotice("已經是第一題");
+    return;
   }
+  const previous = state.previousStack.pop();
   renderQuestion(previous, "previous");
 }
 
@@ -180,6 +193,7 @@ function showEmptyState() {
 
 function renderQuestion(question, direction = "none") {
   state.current = question;
+  state.seenIds.add(question.id);
   state.answered = false;
   els.showAnswer.disabled = false;
   els.result.hidden = true;
@@ -213,7 +227,13 @@ function applyPanelAnimation(direction) {
   window.setTimeout(() => {
     els.panel.classList.remove("slide-next", "slide-previous");
     state.animating = false;
-  }, 280);
+  }, 430);
+}
+
+function showNotice(message) {
+  els.result.className = "result is-notice";
+  els.result.innerHTML = `<strong>${escapeHtml(message)}</strong>`;
+  els.result.hidden = false;
 }
 
 function chooseAnswer(letter) {

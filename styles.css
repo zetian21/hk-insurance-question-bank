@@ -280,6 +280,11 @@ button:disabled {
   border-left-color: var(--red);
 }
 
+.result.is-notice {
+  border-left-color: var(--blue);
+  background: var(--blue-soft);
+}
+
 .result strong {
   display: block;
   margin-bottom: 6px;
