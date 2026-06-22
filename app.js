@@ -1,4 +1,6 @@
 const bank = window.INSURANCE_QUESTION_BANK || { total: 0, questions: [] };
+const simplifiedBank = window.INSURANCE_QUESTION_BANK_SIMPLIFIED || { questions: [] };
+const simplifiedQuestions = new Map(simplifiedBank.questions.map((question) => [question.id, question]));
 const STORAGE_KEY = "hk-insurance-question-bank-v1";
 const NEXT_BUFFER_SIZE = 2;
 
@@ -11,6 +13,7 @@ const els = {
   showAnswer: document.querySelector("#showAnswer"),
   retryWrong: document.querySelector("#retryWrong"),
   resetStats: document.querySelector("#resetStats"),
+  languageToggle: document.querySelector("#languageToggle"),
   questionSubject: document.querySelector("#questionSubject"),
   questionSource: document.querySelector("#questionSource"),
   questionChapter: document.querySelector("#questionChapter"),
@@ -28,6 +31,7 @@ const els = {
 const state = {
   current: null,
   answered: false,
+  textMode: "traditional",
   wrongOnly: false,
   previousStack: [],
   nextStack: [],
@@ -201,13 +205,21 @@ function renderQuestion(question, direction = "none") {
 
   applyPanelAnimation(direction);
 
-  els.questionSubject.textContent = `${question.paper} · ${question.subject}`;
-  els.questionSource.textContent = question.source;
-  els.questionChapter.textContent = `第 ${question.chapter} 章`;
-  els.questionText.textContent = `${question.number}. ${question.question}`;
+  const displayQuestion = getDisplayQuestion(question);
+  els.languageToggle.textContent = state.textMode === "traditional" ? "简" : "繁";
+  els.languageToggle.disabled = !simplifiedQuestions.has(question.id);
+  els.languageToggle.setAttribute(
+    "aria-label",
+    state.textMode === "traditional" ? "切換為簡體" : "切換為繁體",
+  );
+
+  els.questionSubject.textContent = `${displayQuestion.paper} · ${displayQuestion.subject}`;
+  els.questionSource.textContent = displayQuestion.source;
+  els.questionChapter.textContent = `第 ${displayQuestion.chapter} 章`;
+  els.questionText.textContent = `${displayQuestion.number}. ${displayQuestion.question}`;
 
   els.options.innerHTML = "";
-  Object.entries(question.options).forEach(([letter, text]) => {
+  Object.entries(displayQuestion.options).forEach(([letter, text]) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "option";
@@ -216,6 +228,13 @@ function renderQuestion(question, direction = "none") {
     button.addEventListener("click", () => chooseAnswer(letter));
     els.options.append(button);
   });
+}
+
+function getDisplayQuestion(question = state.current) {
+  if (state.textMode === "simplified") {
+    return simplifiedQuestions.get(question.id) || question;
+  }
+  return question;
 }
 
 function applyPanelAnimation(direction) {
@@ -234,6 +253,16 @@ function showNotice(message) {
   els.result.className = "result is-notice";
   els.result.innerHTML = `<strong>${escapeHtml(message)}</strong>`;
   els.result.hidden = false;
+}
+
+function toggleTextMode() {
+  if (!state.current) return;
+  state.textMode = state.textMode === "traditional" ? "simplified" : "traditional";
+  const resultWasVisible = !els.result.hidden && !els.result.classList.contains("is-notice");
+  renderQuestion(state.current, "none");
+  if (resultWasVisible) {
+    revealAnswer();
+  }
 }
 
 function chooseAnswer(letter) {
@@ -263,6 +292,7 @@ function chooseAnswer(letter) {
 function revealAnswer(selectedLetter = null) {
   if (!state.current) return;
   state.answered = true;
+  const displayQuestion = getDisplayQuestion();
 
   [...els.options.children].forEach((button) => {
     const letter = button.dataset.letter;
@@ -275,8 +305,8 @@ function revealAnswer(selectedLetter = null) {
   const prefix = !selectedLetter ? "正確答案" : isWrong ? "答錯了" : "答對了";
   els.result.className = `result${isWrong ? " is-wrong" : ""}`;
   els.result.innerHTML = `
-    <strong>${prefix}: ${state.current.answer}. ${escapeHtml(state.current.options[state.current.answer])}</strong>
-    <span>${escapeHtml(state.current.explanation || "此題暫無解析。")}</span>
+    <strong>${prefix}: ${state.current.answer}. ${escapeHtml(displayQuestion.options[state.current.answer])}</strong>
+    <span>${escapeHtml(displayQuestion.explanation || "此題暫無解析。")}</span>
   `;
   els.result.hidden = false;
 }
@@ -425,6 +455,7 @@ els.chapterFilter.addEventListener("change", () => handleFilterChange());
 els.nextQuestion.addEventListener("click", () => goNext());
 els.nextQuestionBottom.addEventListener("click", () => goNext());
 els.showAnswer.addEventListener("click", () => revealAnswer());
+els.languageToggle.addEventListener("click", toggleTextMode);
 els.retryWrong.addEventListener("click", () => {
   state.wrongOnly = !state.wrongOnly;
   els.retryWrong.textContent = state.wrongOnly ? "退出錯題練習" : "只練錯題";

@@ -198,6 +198,24 @@ button:disabled {
   display: none;
 }
 
+.language-toggle {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 4;
+  min-width: 42px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-color: var(--line);
+  color: var(--blue);
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(22, 38, 50, 0.08);
+}
+
+.language-toggle:disabled {
+  display: none;
+}
+
 .question-meta {
   display: flex;
   flex-wrap: wrap;
@@ -396,7 +414,7 @@ button:disabled {
 
   .swipe-hint {
     display: block;
-    margin: -2px 0 12px;
+    margin: -2px 54px 12px 0;
     color: var(--muted);
     font-size: 13px;
     font-weight: 700;
