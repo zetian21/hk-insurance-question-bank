@@ -64,6 +64,15 @@ function saveHistory() {
 
 function loadSavedFilters() {
   try {
+    const params = new URLSearchParams(window.location.search);
+    const urlFilters = {
+      paper: params.get("paper"),
+      source: params.get("source"),
+      chapter: params.get("chapter"),
+    };
+    if (urlFilters.paper || urlFilters.source || urlFilters.chapter) {
+      return urlFilters;
+    }
     return JSON.parse(localStorage.getItem(FILTER_STORAGE_KEY)) || {};
   } catch {
     return {};
@@ -77,6 +86,19 @@ function saveFilters() {
     chapter: els.chapterFilter.value,
   };
   localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+  syncFiltersToUrl(filters);
+}
+
+function syncFiltersToUrl(filters) {
+  const url = new URL(window.location.href);
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value && value !== "all") {
+      url.searchParams.set(key, value);
+    } else {
+      url.searchParams.delete(key);
+    }
+  });
+  window.history.replaceState({}, "", url);
 }
 
 function unique(values) {
@@ -108,6 +130,7 @@ function populateFilters() {
   restoreSelectValue(els.sourceFilter, savedFilters.source);
   refreshChapterFilter();
   restoreSelectValue(els.chapterFilter, savedFilters.chapter);
+  saveFilters();
 }
 
 function refreshChapterFilter() {
