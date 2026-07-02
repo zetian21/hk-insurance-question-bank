@@ -2,6 +2,7 @@ const bank = window.INSURANCE_QUESTION_BANK || { total: 0, questions: [] };
 const simplifiedBank = window.INSURANCE_QUESTION_BANK_SIMPLIFIED || { questions: [] };
 const simplifiedQuestions = new Map(simplifiedBank.questions.map((question) => [question.id, question]));
 const STORAGE_KEY = "hk-insurance-question-bank-v1";
+const FILTER_STORAGE_KEY = "hk-insurance-question-bank-filters-v1";
 const NEXT_BUFFER_SIZE = 2;
 
 const els = {
@@ -61,6 +62,23 @@ function saveHistory() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.history));
 }
 
+function loadSavedFilters() {
+  try {
+    return JSON.parse(localStorage.getItem(FILTER_STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveFilters() {
+  const filters = {
+    paper: els.paperFilter.value,
+    source: els.sourceFilter.value,
+    chapter: els.chapterFilter.value,
+  };
+  localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+}
+
 function unique(values) {
   return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hant"));
 }
@@ -75,10 +93,21 @@ function setOptions(select, values, allLabel) {
   }
 }
 
+function restoreSelectValue(select, value) {
+  if (!value) return;
+  if ([...select.options].some((option) => option.value === value)) {
+    select.value = value;
+  }
+}
+
 function populateFilters() {
+  const savedFilters = loadSavedFilters();
   setOptions(els.paperFilter, unique(bank.questions.map((q) => q.paper)), "全部科目");
+  restoreSelectValue(els.paperFilter, savedFilters.paper);
   setOptions(els.sourceFilter, unique(bank.questions.map((q) => q.source)), "全部題庫");
+  restoreSelectValue(els.sourceFilter, savedFilters.source);
   refreshChapterFilter();
+  restoreSelectValue(els.chapterFilter, savedFilters.chapter);
 }
 
 function refreshChapterFilter() {
@@ -445,6 +474,7 @@ function handleFilterChange({ refreshChapters = false } = {}) {
   if (refreshChapters) {
     refreshChapterFilter();
   }
+  saveFilters();
   updateStats();
   resetQuestionFlow();
 }
