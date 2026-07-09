@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>保險試題精講電子書</title>
+    <link rel="stylesheet" href="ebook.css" />
+  </head>
+  <body>
+    <main class="ebook-app">
+      <header class="reader-bar" aria-label="電子書工具列">
+        <div class="book-title">
+          <span>保險試題精講</span>
+          <strong id="pageLabel">第 1 / 61 頁</strong>
+        </div>
+
+        <div class="pager-controls">
+          <button id="prevPage" class="icon-btn" type="button" title="上一頁" aria-label="上一頁">‹</button>
+          <label class="page-jump">
+            <input id="pageInput" type="number" min="1" max="61" value="1" aria-label="頁碼" />
+          </label>
+          <button id="nextPage" class="icon-btn" type="button" title="下一頁" aria-label="下一頁">›</button>
+        </div>
+
+        <div class="view-controls">
+          <button id="zoomOut" class="tool-btn" type="button" title="縮小" aria-label="縮小">−</button>
+          <button id="fitPage" class="tool-btn" type="button" title="適合頁面" aria-label="適合頁面">⤢</button>
+          <button id="zoomIn" class="tool-btn" type="button" title="放大" aria-label="放大">＋</button>
+        </div>
+      </header>
+
+      <section class="reader-stage" aria-label="電子書閱讀區">
+        <button id="stagePrev" class="stage-hit stage-hit-left" type="button" aria-label="上一頁"></button>
+        <figure id="pageFrame" class="page-frame">
+          <img id="pageImage" src="ebook-pages/page-001.jpg" alt="保險試題精講第 1 頁" draggable="false" />
+        </figure>
+        <button id="stageNext" class="stage-hit stage-hit-right" type="button" aria-label="下一頁"></button>
+      </section>
+
+      <footer class="reader-footer">
+        <input id="pageSlider" type="range" min="1" max="61" value="1" aria-label="翻頁進度" />
+        <div class="thumb-strip" id="thumbStrip" aria-label="頁面縮圖"></div>
+      </footer>
+    </main>
+
+    <script src="ebook.js"></script>
+  </body>
+</html>
