@@ -93,10 +93,10 @@ button {
 }
 
 .icon-btn,
-.tool-btn {
+.tool-btn,
+.text-link {
   display: grid;
   place-items: center;
-  width: 42px;
   height: 42px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -104,6 +104,18 @@ button {
   background: var(--panel);
   font-weight: 850;
   box-shadow: 0 8px 22px rgba(18, 30, 40, 0.08);
+}
+
+.icon-btn,
+.tool-btn {
+  width: 42px;
+}
+
+.text-link {
+  min-width: 66px;
+  padding: 0 12px;
+  text-decoration: none;
+  font-size: 14px;
 }
 
 .icon-btn {
